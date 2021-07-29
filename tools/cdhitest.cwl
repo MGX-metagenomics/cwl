@@ -21,8 +21,7 @@ inputs:
       prefix: "-i"
 
   identity-threshold:
-# FIXME: float?
-    type: int?
+    type: float?
     default: 0.9
     inputBinding:
       position: 3
