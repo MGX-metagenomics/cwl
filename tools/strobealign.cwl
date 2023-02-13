@@ -35,12 +35,12 @@ inputs:
       position: 1
       prefix: "-t"
 
-  read-length:
-    type: int?
-    default: 150
+  skip_unaligned:
+    type: boolean
+    default: true
     inputBinding:
       position: 2
-      prefix: "-r"
+      prefix: "-U"
 
 arguments:
 
