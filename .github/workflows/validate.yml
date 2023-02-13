@@ -1,0 +1,24 @@
+
+name: Check CWL validity
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install cwltool
+      run: sudo apt-get install -qq cwltool
+    - name: Validate CWL files
+      run: |
+        cd tools
+        for f in *.cwl; do
+          cwltool --validate ${f}
+        done
