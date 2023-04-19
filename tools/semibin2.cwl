@@ -34,19 +34,26 @@ inputs:
       position: 3
       prefix: '--prodigal-output-faa'
 
+  threads:
+    type: int?
+    default: 10
+    inputBinding:
+      position: 4
+      prefix: "--threads"
+
 arguments:
-  - position: 4
+  - position: 5
     prefix: "-o"
     valueFrom: "outdir"
 
-  - position: 5
+  - position: 6
     valueFrom: "--self-supervised"
 
-  - position: 6
+  - position: 7
     prefix: "--environment"
     valueFrom: "global"
 
-  - position: 7
+  - position: 8
     prefix: "--engine"
     valueFrom: "cpu"
 
