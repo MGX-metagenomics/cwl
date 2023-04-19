@@ -10,7 +10,7 @@ label: "SemiBin: Metagenomic Binning Using Siamese Neural Networks for short and
 requirements:
   - class: InlineJavascriptRequirement
 
-baseCommand: [SemiBin2, multi_easy_bin]
+baseCommand: [SemiBin2, single_easy_bin]
 
 inputs:
 
