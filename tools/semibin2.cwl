@@ -46,8 +46,11 @@ arguments:
     prefix: "--environment"
     valueFrom: "global"
 
-outputs:
+  - position: 7
+    prefix: "--engine"
+    valueFrom: "cpu"
 
+outputs:
   binAssignment:
     type: File
     format: http://edamontology.org/format_3475 # TSV
