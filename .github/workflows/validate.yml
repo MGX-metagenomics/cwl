@@ -22,9 +22,15 @@ jobs:
           echo ${f}
           python -c 'import yaml, sys; yaml.safe_load(sys.stdin)' < ${f}
         done
-    - name: Validate CWL files
+    - name: Validate CWL tool definitions
       run: |
         cd tools
         for f in *.cwl; do
           cwltool --validate ${f}
         done
+    - name: Validate CWL workflows
+      run: |
+        for f in *.cwl; do
+          cwltool --validate ${f}
+        done
+
