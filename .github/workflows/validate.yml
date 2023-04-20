@@ -15,7 +15,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install cwltool
-      run: sudo apt-get install -qq cwltool
+      run: sudo apt-get install -qq cwltool python3-yaml
+    - name: YAML syntax validation 
+      run: |
+        for f in tools/*cwl *.cwl; do
+          echo ${f}
+          python -c 'import yaml, sys; yaml.safe_load(sys.stdin)' < ${f}
+        done
     - name: Validate CWL files
       run: |
         cd tools
