@@ -12,7 +12,7 @@ requirements:
 baseCommand: [ "bash", "reformat.sh" ]
 
 inputs:
-  vampOutput:
+  vambOutput:
     type: File
     format: http://edamontology.org/format_3475 # TSV
     inputBinding:
