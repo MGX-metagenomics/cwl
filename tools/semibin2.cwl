@@ -5,7 +5,7 @@ hints:
   DockerRequirement:     
     dockerPull: sjaenick/semibin2
 
-label: "SemiBin: Metagenomic Binning Using Siamese Neural Networks for short and long reads"
+label: "SemiBin 2"
 
 requirements:
   - class: InlineJavascriptRequirement
