@@ -13,20 +13,20 @@ inputs:
   - id: runIds
     type: 'string[]'
     doc: MGX seqrun IDs
-    'sbg:x': -960.977783203125
-    'sbg:y': -519.2344360351562
+    'sbg:x': -1998.548095703125
+    'sbg:y': -476.452392578125
   - id: apiKey
     type: string
-    'sbg:x': -959.557861328125
-    'sbg:y': -141.82296752929688
+    'sbg:x': -1995.6141357421875
+    'sbg:y': -61.706756591796875
   - id: projectName
     type: string
-    'sbg:x': -959.6152954101562
-    'sbg:y': -395.3645935058594
+    'sbg:x': -2003.3499755859375
+    'sbg:y': -340.8485107421875
   - id: hostURI
     type: string
-    'sbg:x': -955.8181762695312
-    'sbg:y': -272.5052490234375
+    'sbg:x': -2001.72265625
+    'sbg:y': -196.57472229003906
   - id: taxonomyDirectory
     type: Directory
     'sbg:x': 1716.697509765625
@@ -37,19 +37,19 @@ inputs:
     'sbg:y': -735.12158203125
   - id: kraken2DatabaseDir
     type: Directory
-    'sbg:x': 1340.703125
-    'sbg:y': -93.4775619506836
+    'sbg:x': 1405.8983154296875
+    'sbg:y': -285.9196472167969
   - id: dastoolDatabaseDir
     type: Directory
-    'sbg:x': 822.3442993164062
-    'sbg:y': -543.8947143554688
+    'sbg:x': 856.934814453125
+    'sbg:y': -655.3026123046875
 outputs:
   - id: success
     outputSource:
       - annotationclient/success
     type: boolean
-    'sbg:x': 2689.745361328125
-    'sbg:y': -53.31770324707031
+    'sbg:x': 2657.0322265625
+    'sbg:y': -49.6494140625
 steps:
   - id: fastp
     in:
@@ -57,6 +57,8 @@ steps:
         source: seqrunfetch/fwdReads
       - id: read2
         source: seqrunfetch/revReads
+      - id: trim-poly-g
+        default: true
     out:
       - id: reads1
       - id: reads2
@@ -66,8 +68,8 @@ steps:
       - read1
       - read2
     scatterMethod: dotproduct
-    'sbg:x': -521.5368041992188
-    'sbg:y': -372.72918701171875
+    'sbg:x': -1147.20068359375
+    'sbg:y': 389.0754699707031
   - id: megahit
     in:
       - id: read1
@@ -80,21 +82,12 @@ steps:
       - id: contigs
     run: tools/megahit.cwl
     label: 'MEGAHIT: metagenome assembly'
-    'sbg:x': -132
-    'sbg:y': -380.096923828125
-  - id: bowtie2_build
-    in:
-      - id: reference
-        source: megahit/contigs
-    out:
-      - id: index
-    run: tools/bowtie2_build.cwl
-    'sbg:x': -96.41685485839844
-    'sbg:y': -153.67196655273438
+    'sbg:x': -477.37213134765625
+    'sbg:y': 392.39459228515625
   - id: samtools_sam2bam
     in:
       - id: input
-        source: bowtie2/alignment
+        source: strobealign/sam
       - id: thread-number
         default: 8
     out:
@@ -103,8 +96,8 @@ steps:
     scatter:
       - input
     scatterMethod: dotproduct
-    'sbg:x': 190.90786743164062
-    'sbg:y': 23.49307632446289
+    'sbg:x': 215.52435302734375
+    'sbg:y': 552.3421020507812
   - id: samtools_sort
     in:
       - id: input
@@ -117,56 +110,8 @@ steps:
     scatter:
       - input
     scatterMethod: dotproduct
-    'sbg:x': 338.39495849609375
-    'sbg:y': 23.79859161376953
-  - id: metabat
-    in:
-      - id: bamfiles
-        source:
-          - samtools_sort/output
-      - id: contigs
-        source: megahit/contigs
-      - id: save-class
-        default: true
-      - id: suppressBinOutput
-        default: true
-    out:
-      - id: binAssignment
-    run: tools/metabat.cwl
-    label: 'MetaBAT: Metagenome Binning'
-    'sbg:x': 608.19482421875
-    'sbg:y': -153.64015197753906
-  - id: bowtie2
-    in:
-      - id: index
-        source:
-          - bowtie2_build/index
-      - id: output_file
-        valueFrom: |
-          ${   
-            return inputs.read1.nameroot + "_mapped.sam"
-          }
-      - id: read1
-        source:
-          - fastp/reads1
-        valueFrom: '$([self])'
-      - id: read2
-        source:
-          - fastp/reads2
-        valueFrom: '$([self])'
-      - id: skip_unaligned
-        default: true
-      - id: thread-number
-        default: 8
-    out:
-      - id: alignment
-    run: tools/bowtie2.cwl
-    scatter:
-      - read1
-      - read2
-    scatterMethod: dotproduct
-    'sbg:x': 29.385665893554688
-    'sbg:y': 22.917165756225586
+    'sbg:x': 383.2618103027344
+    'sbg:y': 558.3683471679688
   - id: checkm
     in:
       - id: bin_suffix
@@ -212,8 +157,8 @@ steps:
     scatter:
       - bamFile
     scatterMethod: dotproduct
-    'sbg:x': 1588.5606689453125
-    'sbg:y': 248.06858825683594
+    'sbg:x': 1605.001953125
+    'sbg:y': 299.0058898925781
   - id: kraken2
     in:
       - id: databaseDir
@@ -230,8 +175,8 @@ steps:
     scatter:
       - querySequences
     scatterMethod: dotproduct
-    'sbg:x': 1486.30517578125
-    'sbg:y': -303.1912841796875
+    'sbg:x': 1525.156982421875
+    'sbg:y': -324.01104736328125
   - id: assign_bin
     in:
       - id: kraken2Output
@@ -247,33 +192,18 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': 1866.4539794921875
     'sbg:y': -317.1265563964844
-  - id: concoct
-    in:
-      - id: bamFiles
-        source:
-          - samtools_sort/output
-      - id: contigs
-        source: megahit/contigs
-      - id: threads
-        default: 8
-    out:
-      - id: binAssignment
-    run: tools/concoct.cwl
-    label: CONCOCT
-    'sbg:x': 602.8667602539062
-    'sbg:y': -301.5096130371094
   - id: createtsvlist
     in:
       - id: file1
-        source: metabat/binAssignment
+        source: vamb2bintsv/binAssignment
       - id: file2
-        source: concoct/binAssignment
+        source: semibin2/binAssignment
     out:
       - id: files
     run: tools/CreateTSVList.cwl
     label: CreateTSVList
-    'sbg:x': 783.26171875
-    'sbg:y': -270.7899169921875
+    'sbg:x': 751.8648071289062
+    'sbg:y': -504.7113952636719
   - id: dastool
     in:
       - id: binAssignments
@@ -283,16 +213,14 @@ steps:
         source: megahit/contigs
       - id: dastoolDatabaseDir
         source: dastoolDatabaseDir
-      - id: proteins
-        source: prodigal_1/proteins
       - id: threads
         default: 8
     out:
       - id: binTSV
     run: tools/dastool.cwl
     label: DAS tool
-    'sbg:x': 956.87939453125
-    'sbg:y': -388.86944580078125
+    'sbg:x': 966.7775268554688
+    'sbg:y': -584.3911743164062
   - id: samtools_merge
     in:
       - id: inputs
@@ -303,8 +231,8 @@ steps:
     out:
       - id: output
     run: tools/samtools-merge.cwl
-    'sbg:x': 1085.156982421875
-    'sbg:y': 525.2728881835938
+    'sbg:x': 1086.564697265625
+    'sbg:y': 551.5995483398438
   - id: feature_counts_1
     in:
       - id: annotation
@@ -342,8 +270,8 @@ steps:
       - id: binFastas
     run: tools/tsv2bins.cwl
     label: TSV to binned FASTA
-    'sbg:x': 1142.4676513671875
-    'sbg:y': -451.083984375
+    'sbg:x': 1162.4385986328125
+    'sbg:y': -487.7795104980469
   - id: prodigal_1
     in:
       - id: inputFile
@@ -405,8 +333,8 @@ steps:
       - id: success
     run: tools/annotationclient.cwl
     label: MGX Annotate
-    'sbg:x': 2464.35986328125
-    'sbg:y': -54.31770324707031
+    'sbg:x': 2443.158203125
+    'sbg:y': -52.65791320800781
   - id: seqrunfetch
     in:
       - id: apiKey
@@ -425,9 +353,63 @@ steps:
     scatter:
       - runId
     scatterMethod: dotproduct
-    'sbg:x': -749.3961791992188
-    'sbg:y': -371.4114685058594
-hints:
-  - {}
+    'sbg:x': -1400.3929443359375
+    'sbg:y': 389.80621337890625
+  - id: strobealign
+    in:
+      - id: read1
+        source: fastp/reads1
+      - id: read2
+        source: fastp/reads2
+      - id: reference
+        source: megahit/contigs
+      - id: skip_unaligned
+        default: true
+    out:
+      - id: sam
+    run: tools/strobealign.cwl
+    label: StrobeAlign - fast short read aligner
+    scatter:
+      - read1
+      - read2
+    scatterMethod: dotproduct
+    'sbg:x': 30.550609588623047
+    'sbg:y': 550.9737548828125
+  - id: vamb
+    in:
+      - id: bamfiles
+        source:
+          - samtools_sort/output
+      - id: contigs
+        source: megahit/contigs
+    out:
+      - id: binAssignment
+    run: tools/vamb.cwl
+    label: VAMB
+    'sbg:x': 502.3221130371094
+    'sbg:y': -659.5704956054688
+  - id: semibin2
+    in:
+      - id: bamfiles
+        source:
+          - samtools_sort/output
+      - id: contigs
+        source: megahit/contigs
+    out:
+      - id: binAssignment
+    run: tools/semibin2.cwl
+    label: SemiBin 2
+    'sbg:x': 488.7420654296875
+    'sbg:y': -821.9281005859375
+  - id: vamb2bintsv
+    in:
+      - id: vambOutput
+        source: vamb/binAssignment
+    out:
+      - id: binAssignment
+    run: tools/vamb2bintsv.cwl
+    label: VAMB to Bin TSV
+    'sbg:x': 575.9758911132812
+    'sbg:y': -542.1419067382812
 requirements:
   - class: ScatterFeatureRequirement
