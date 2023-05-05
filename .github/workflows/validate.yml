@@ -15,7 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install cwltool
-      run: sudo apt-get install -qq cwltool python3-yaml
+      run: |
+        sudo apt-get install -qq python3-yaml python3-pip
+        sudo pip3 install --force-reinstall cwltool
     - name: YAML syntax validation 
       run: |
         for f in tools/*cwl *.cwl; do
