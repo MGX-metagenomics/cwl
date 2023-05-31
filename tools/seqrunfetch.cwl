@@ -39,14 +39,20 @@ inputs:
 outputs:
 
   fwdReads:
-    type: File
+    type: File?
     format: http://edamontology.org/format_1930 # FASTQ
     outputBinding:
       glob: $(inputs.runId + "_R1.fq")
 
   revReads:
-    type: File
+    type: File?
     format: http://edamontology.org/format_1930 # FASTQ
     outputBinding:
       glob: $(inputs.runId + "_R2.fq")
- 
+
+  singleReads:
+    type: File?
+    format: http://edamontology.org/format_1930 # FASTQ
+    outputBinding:
+      glob: $(inputs.runId + "_single.fq")
+
