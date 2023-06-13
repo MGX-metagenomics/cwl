@@ -1,6 +1,9 @@
 cwlVersion: v1.0
 class: CommandLineTool
 
+requirements:
+  - class: InlineJavascriptRequirement
+
 hints:   
   DockerRequirement:     
     dockerPull: sjaenick/mgxannotate
