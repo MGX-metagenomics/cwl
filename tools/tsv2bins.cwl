@@ -16,6 +16,7 @@ inputs:
 
   scaffold2bin:
     type: File
+    default: /dev/null
     format: http://edamontology.org/format_3475 # TSV
     inputBinding:
       position: 1
