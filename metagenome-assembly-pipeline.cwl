@@ -63,13 +63,13 @@ steps:
       - id: reads1
       - id: reads2
     run: tools/fastp.cwl
-    label: 'fastp: An ultra-fast all-in-one FASTQ preprocessor'
+    label: 'fastp: trim PE reads'
     scatter:
       - read1
       - read2
     scatterMethod: dotproduct
-    'sbg:x': -1147.20068359375
-    'sbg:y': 389.0754699707031
+    'sbg:x': -1094.861572265625
+    'sbg:y': 419.8493957519531
   - id: megahit
     in:
       - id: read1
@@ -78,6 +78,9 @@ steps:
       - id: read2
         source:
           - fastp/reads2
+      - id: singleended
+        source:
+          - fastp_1/reads1
     out:
       - id: contigs
     run: tools/megahit.cwl
@@ -161,6 +164,8 @@ steps:
     'sbg:y': 299.0058898925781
   - id: kraken2
     in:
+      - id: confidenceThreshold
+        default: 0.6
       - id: databaseDir
         source: kraken2DatabaseDir
       - id: proteinQuery
@@ -231,8 +236,8 @@ steps:
     out:
       - id: output
     run: tools/samtools-merge.cwl
-    'sbg:x': 1086.564697265625
-    'sbg:y': 551.5995483398438
+    'sbg:x': 1012.8106689453125
+    'sbg:y': 714.6527709960938
   - id: feature_counts_1
     in:
       - id: annotation
@@ -240,7 +245,7 @@ steps:
       - id: attribute_type
         default: ID
       - id: bamFile
-        source: samtools_merge/output
+        source: samtools_merge_2/output
       - id: feature_type
         default: CDS
       - id: outFile
@@ -253,7 +258,7 @@ steps:
   - id: bamstats
     in:
       - id: bamFile
-        source: samtools_merge/output
+        source: samtools_merge_2/output
     out:
       - id: tsvOutput
     run: tools/bamstats.cwl
@@ -348,6 +353,7 @@ steps:
     out:
       - id: fwdReads
       - id: revReads
+      - id: singleReads
     run: tools/seqrunfetch.cwl
     label: MGX Fetch sequences
     scatter:
@@ -368,7 +374,7 @@ steps:
     out:
       - id: sam
     run: tools/strobealign.cwl
-    label: StrobeAlign - fast short read aligner
+    label: 'StrobeAlign: map PE reads'
     scatter:
       - read1
       - read2
@@ -411,5 +417,80 @@ steps:
     label: VAMB to Bin TSV
     'sbg:x': 575.9758911132812
     'sbg:y': -542.1419067382812
+  - id: fastp_1
+    in:
+      - id: read1
+        source: seqrunfetch/singleReads
+    out:
+      - id: reads1
+      - id: reads2
+    run: tools/fastp.cwl
+    label: 'fastp: trim SE reads'
+    scatter:
+      - read1
+    scatterMethod: dotproduct
+    'sbg:x': -1085.7545166015625
+    'sbg:y': 178.67938232421875
+  - id: strobealign_1
+    in:
+      - id: read1
+        source: fastp_1/reads1
+      - id: reference
+        source: megahit/contigs
+    out:
+      - id: sam
+    run: tools/strobealign.cwl
+    label: 'StrobeAlign: map SE reads'
+    scatter:
+      - read1
+    scatterMethod: dotproduct
+    'sbg:x': 16.529380798339844
+    'sbg:y': 296.0989074707031
+  - id: samtools_sam2bam_1
+    in:
+      - id: input
+        source: strobealign_1/sam
+    out:
+      - id: output
+    run: tools/samtools-sam2bam.cwl
+    scatter:
+      - input
+    scatterMethod: dotproduct
+    'sbg:x': 199.96910095214844
+    'sbg:y': 296.8038330078125
+  - id: samtools_sort_1
+    in:
+      - id: input
+        source: samtools_sam2bam_1/output
+    out:
+      - id: output
+    run: tools/samtools-sort.cwl
+    scatter:
+      - input
+    scatterMethod: dotproduct
+    'sbg:x': 353.5250244140625
+    'sbg:y': 295.3158264160156
+  - id: samtools_merge_1
+    in:
+      - id: inputs
+        source:
+          - samtools_sort_1/output
+    out:
+      - id: output
+    run: tools/samtools-merge.cwl
+    'sbg:x': 1015.1173706054688
+    'sbg:y': 535.9713134765625
+  - id: samtools_merge_2
+    in:
+      - id: inputs
+        source:
+          - samtools_merge_1/output
+          - samtools_merge/output
+    out:
+      - id: output
+    run: tools/samtools-merge.cwl
+    'sbg:x': 1241.137451171875
+    'sbg:y': 627.0687255859375
 requirements:
   - class: ScatterFeatureRequirement
+  - class: MultipleInputFeatureRequirement
