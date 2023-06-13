@@ -2,6 +2,8 @@
 
 set -e
 
+export PATH=/vol/mgx-sw/bin:$PATH
+
 for wf in *cwl; do
     name=`basename ${wf} .cwl`
     cwltool --pack $wf > tmp.json
