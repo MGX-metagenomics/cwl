@@ -37,11 +37,19 @@ inputs:
       position: 3
       prefix: "--protein-query"
 
+  confidenceThreshold:
+    type: float?
+    default: 0.0
+    inputBinding:
+      position: 4
+      prefix: "--confidence"
+
+
   querySequences:
     type: File
     format: http://edamontology.org/format_1929 # FASTA
     inputBinding:
-      position: 5
+      position: 6
 
 arguments:
 
