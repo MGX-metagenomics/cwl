@@ -55,7 +55,7 @@ inputs:
       itemSeparator: ","
 
   checkmReport:
-    type: File
+    type: File?
     format: http://edamontology.org/format_3475 # TSV
 
   binnedFastas:
@@ -63,7 +63,7 @@ inputs:
     format: http://edamontology.org/format_1929 # FASTA
 
   binLineages:
-    type: File[]
+    type: File[]?
 
   featureCountsPerSample:
     type: File[]
