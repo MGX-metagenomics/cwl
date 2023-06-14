@@ -494,3 +494,4 @@ steps:
 requirements:
   - class: ScatterFeatureRequirement
   - class: MultipleInputFeatureRequirement
+  - class: InlineJavascriptRequirement
