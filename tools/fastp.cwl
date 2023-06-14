@@ -4,6 +4,9 @@ class: CommandLineTool
 label: "fastp: An ultra-fast all-in-one FASTQ preprocessor"
 
 requirements:
+  - class: ResourceRequirement
+    ramMin: 3000
+    coresMin: 8
   - class: InlineJavascriptRequirement
 
 hints:
