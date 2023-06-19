@@ -1,5 +1,5 @@
 class: Workflow
-cwlVersion: v1.0
+cwlVersion: v1.2
 id: metagenome_assembly_pipeline
 label: Metagenome Assembly and Quantification
 $namespaces:
@@ -41,8 +41,8 @@ inputs:
     'sbg:y': -285.9196472167969
   - id: dastoolDatabaseDir
     type: Directory
-    'sbg:x': 856.934814453125
-    'sbg:y': -655.3026123046875
+    'sbg:x': 783.4692993164062
+    'sbg:y': -678.166015625
 outputs:
   - id: success
     outputSource:
@@ -81,6 +81,7 @@ steps:
       - id: singleended
         source:
           - fastp_1/reads1
+        pickValue: all_non_null
     out:
       - id: contigs
     run: tools/megahit.cwl
@@ -90,7 +91,7 @@ steps:
   - id: samtools_sam2bam
     in:
       - id: input
-        source: strobealign/sam
+        source: strobealign_pe/sam
       - id: thread-number
         default: 8
     out:
@@ -106,7 +107,7 @@ steps:
       - id: input
         source: samtools_sam2bam/output
       - id: thread-number
-        default: 8
+        default: 10
     out:
       - id: output
     run: tools/samtools-sort.cwl
@@ -361,7 +362,7 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': -1400.3929443359375
     'sbg:y': 389.80621337890625
-  - id: strobealign
+  - id: strobealign_pe
     in:
       - id: read1
         source: fastp/reads1
@@ -431,10 +432,12 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': -1085.7545166015625
     'sbg:y': 178.67938232421875
-  - id: strobealign_1
+    when: $(inputs.read1 != null)
+  - id: strobealign_se
     in:
       - id: read1
         source: fastp_1/reads1
+        pickValue: all_non_null
       - id: reference
         source: megahit/contigs
     out:
@@ -449,7 +452,7 @@ steps:
   - id: samtools_sam2bam_1
     in:
       - id: input
-        source: strobealign_1/sam
+        source: strobealign_se/sam
     out:
       - id: output
     run: tools/samtools-sam2bam.cwl
