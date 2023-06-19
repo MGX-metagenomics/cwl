@@ -152,17 +152,20 @@ steps:
       - id: attribute_type
         default: ID
       - id: bamFile
-        source: samtools_sort/output
+        source:
+          - samtools_sort/output
+          - samtools_sort_1/output
       - id: feature_type
         default: CDS
     out:
       - id: output_counts
     run: tools/featureCounts.cwl
+    label: featureCounts per sample
     scatter:
       - bamFile
     scatterMethod: dotproduct
-    'sbg:x': 1605.001953125
-    'sbg:y': 299.0058898925781
+    'sbg:x': 1720.394287109375
+    'sbg:y': 384.7659912109375
   - id: kraken2
     in:
       - id: confidenceThreshold
@@ -227,18 +230,6 @@ steps:
     label: DAS tool
     'sbg:x': 966.7775268554688
     'sbg:y': -584.3911743164062
-  - id: samtools_merge
-    in:
-      - id: inputs
-        source:
-          - samtools_sort/output
-      - id: outFile
-        default: total_mapped.bam
-    out:
-      - id: output
-    run: tools/samtools-merge.cwl
-    'sbg:x': 1012.8106689453125
-    'sbg:y': 714.6527709960938
   - id: feature_counts_totalcoverage
     in:
       - id: annotation
@@ -246,7 +237,7 @@ steps:
       - id: attribute_type
         default: ID
       - id: bamFile
-        source: samtools_merge_2/output
+        source: samtools_merge_all/output
       - id: feature_type
         default: CDS
       - id: outFile
@@ -259,11 +250,11 @@ steps:
   - id: bamstats
     in:
       - id: bamFile
-        source: samtools_merge_2/output
+        source: samtools_merge_all/output
     out:
       - id: tsvOutput
     run: tools/bamstats.cwl
-    label: 'bamstats: BAM alignment statistics per reference sequence'
+    label: bamstats contig coverage
     'sbg:x': 1698.8221435546875
     'sbg:y': 788.7218017578125
   - id: tsv2bins
@@ -288,8 +279,8 @@ steps:
       - id: proteins
     run: tools/prodigal.cwl
     label: Prodigal 2.6.3
-    'sbg:x': 1122.874755859375
-    'sbg:y': 288.3991394042969
+    'sbg:x': 1123.1719970703125
+    'sbg:y': 290.3439025878906
   - id: renamefile
     in:
       - id: srcfile
@@ -473,22 +464,12 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': 353.5250244140625
     'sbg:y': 295.3158264160156
-  - id: samtools_merge_1
+  - id: samtools_merge_all
     in:
       - id: inputs
         source:
           - samtools_sort_1/output
-    out:
-      - id: output
-    run: tools/samtools-merge.cwl
-    'sbg:x': 1015.1173706054688
-    'sbg:y': 535.9713134765625
-  - id: samtools_merge_2
-    in:
-      - id: inputs
-        source:
-          - samtools_merge_1/output
-          - samtools_merge/output
+          - samtools_sort/output
     out:
       - id: output
     run: tools/samtools-merge.cwl
@@ -498,3 +479,4 @@ requirements:
   - class: ScatterFeatureRequirement
   - class: MultipleInputFeatureRequirement
   - class: InlineJavascriptRequirement
+
