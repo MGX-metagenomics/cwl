@@ -239,7 +239,7 @@ steps:
     run: tools/samtools-merge.cwl
     'sbg:x': 1012.8106689453125
     'sbg:y': 714.6527709960938
-  - id: feature_counts_1
+  - id: feature_counts_totalcoverage
     in:
       - id: annotation
         source: prodigal_1/annotations
@@ -325,7 +325,7 @@ steps:
         source:
           - renamefile/outfile
       - id: featureCountsTotal
-        source: feature_counts_1/output_counts
+        source: feature_counts_totalcoverage/output_counts
       - id: hostURI
         source: hostURI
       - id: predictedGenes
