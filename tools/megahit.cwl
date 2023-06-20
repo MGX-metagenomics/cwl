@@ -5,6 +5,12 @@ hints:
   DockerRequirement:     
     dockerPull: sjaenick/megahit
 
+requirements:
+  - class: ResourceRequirement
+    ramMin: 250000
+    coresMin: 128
+
+
 label: "MEGAHIT: metagenome assembly"
 
 baseCommand: megahit
@@ -50,7 +56,8 @@ inputs:
 #      prefix: "-o"
 
   thread-number:
-    type: int?
+    type: int
+    default: 128
     inputBinding:
       position: 6
       prefix: "--num-cpu-threads"
@@ -67,6 +74,13 @@ inputs:
     inputBinding:
       position: 8
       prefix: "--presets"
+
+  memory:
+    type: int?
+    default: 250000000
+    inputBinding:
+      position: 9
+      prefix: "--memory"
 
 outputs:
   contigs:
