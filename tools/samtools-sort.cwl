@@ -32,7 +32,7 @@ arguments:
     prefix: "-o"
     valueFrom: |
       ${
-        return inputs.input.nameroot + ".bam"
+        return inputs.input.nameroot + "_sorted.bam"
       }
 
 outputs:
@@ -41,5 +41,5 @@ outputs:
     type: File
     format: http://edamontology.org/format_2572 # BAM
     outputBinding:
-      glob: $(inputs.input.nameroot + ".bam")
+      glob: $(inputs.input.nameroot + "_sorted.bam")
 
