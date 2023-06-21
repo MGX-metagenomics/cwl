@@ -41,8 +41,8 @@ inputs:
     'sbg:y': -285.9196472167969
   - id: dastoolDatabaseDir
     type: Directory
-    'sbg:x': 783.4692993164062
-    'sbg:y': -678.166015625
+    'sbg:x': 909.6793823242188
+    'sbg:y': -747.2562866210938
 outputs:
   - id: success
     outputSource:
@@ -93,7 +93,7 @@ steps:
       - id: input
         source: strobealign_pe/sam
       - id: thread-number
-        default: 8
+        default: 10
     out:
       - id: output
     run: tools/samtools-sam2bam.cwl
@@ -145,27 +145,25 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': 1275.5765380859375
     'sbg:y': -337.3270568847656
-  - id: feature_counts
+  - id: feature_counts_pe_samples
     in:
       - id: annotation
         source: prodigal_1/annotations
       - id: attribute_type
         default: ID
       - id: bamFile
-        source:
-          - samtools_sort/output
-          - samtools_sort_1/output
+        source: samtools_sort/output
       - id: feature_type
         default: CDS
     out:
       - id: output_counts
     run: tools/featureCounts.cwl
-    label: featureCounts per sample
+    label: featureCounts per paired sample
     scatter:
       - bamFile
     scatterMethod: dotproduct
-    'sbg:x': 1720.394287109375
-    'sbg:y': 384.7659912109375
+    'sbg:x': 1710.6326904296875
+    'sbg:y': 397.3818664550781
   - id: kraken2
     in:
       - id: confidenceThreshold
@@ -201,35 +199,26 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': 1866.4539794921875
     'sbg:y': -317.1265563964844
-  - id: createtsvlist
-    in:
-      - id: file1
-        source: vamb2bintsv/binAssignment
-      - id: file2
-        source: semibin2/binAssignment
-    out:
-      - id: files
-    run: tools/CreateTSVList.cwl
-    label: CreateTSVList
-    'sbg:x': 751.8648071289062
-    'sbg:y': -504.7113952636719
   - id: dastool
     in:
       - id: binAssignments
+        linkMerge: merge_flattened
         source:
-          - createtsvlist/files
+          - removefirstline/binAssignment
+          - filterbin/filtered
+          - metabat/binAssignment
       - id: contigs
         source: megahit/contigs
       - id: dastoolDatabaseDir
         source: dastoolDatabaseDir
       - id: threads
-        default: 8
+        default: 10
     out:
       - id: binTSV
     run: tools/dastool.cwl
     label: DAS tool
-    'sbg:x': 966.7775268554688
-    'sbg:y': -584.3911743164062
+    'sbg:x': 1043.5084228515625
+    'sbg:y': -626.27734375
   - id: feature_counts_totalcoverage
     in:
       - id: annotation
@@ -240,8 +229,8 @@ steps:
         source: samtools_merge_all/output
       - id: feature_type
         default: CDS
-      - id: outFile
-        default: featureCounts_total.tsv
+      - id: paired
+        default: true
     out:
       - id: output_counts
     run: tools/featureCounts.cwl
@@ -281,21 +270,6 @@ steps:
     label: Prodigal 2.6.3
     'sbg:x': 1123.1719970703125
     'sbg:y': 290.3439025878906
-  - id: renamefile
-    in:
-      - id: srcfile
-        source: feature_counts/output_counts
-      - id: newname
-        source: runIds
-    out:
-      - id: outfile
-    run: tools/renamefile.cwl
-    scatter:
-      - srcfile
-      - newname
-    scatterMethod: dotproduct
-    'sbg:x': 1835.0096435546875
-    'sbg:y': 176.96951293945312
   - id: annotationclient
     in:
       - id: apiKey
@@ -313,8 +287,10 @@ steps:
       - id: contigCoverage
         source: bamstats/tsvOutput
       - id: featureCountsPerSample
+        linkMerge: merge_flattened
         source:
-          - renamefile/outfile
+          - feature_counts_se_samples/output_counts
+          - feature_counts_pe_samples/output_counts
       - id: featureCountsTotal
         source: feature_counts_totalcoverage/output_counts
       - id: hostURI
@@ -407,8 +383,8 @@ steps:
       - id: binAssignment
     run: tools/vamb2bintsv.cwl
     label: VAMB to Bin TSV
-    'sbg:x': 575.9758911132812
-    'sbg:y': -542.1419067382812
+    'sbg:x': 637.894775390625
+    'sbg:y': -590.1747436523438
   - id: fastp_1
     in:
       - id: read1
@@ -467,6 +443,7 @@ steps:
   - id: samtools_merge_all
     in:
       - id: inputs
+        linkMerge: merge_flattened
         source:
           - samtools_sort_1/output
           - samtools_sort/output
@@ -475,6 +452,62 @@ steps:
     run: tools/samtools-merge.cwl
     'sbg:x': 1241.137451171875
     'sbg:y': 627.0687255859375
+  - id: feature_counts_se_samples
+    in:
+      - id: annotation
+        source: prodigal_1/annotations
+      - id: attribute_type
+        default: ID
+      - id: bamFile
+        source: samtools_sort_1/output
+      - id: feature_type
+        default: CDS
+    out:
+      - id: output_counts
+    run: tools/featureCounts.cwl
+    label: featureCounts per single-end sample
+    scatter:
+      - bamFile
+    scatterMethod: dotproduct
+    'sbg:x': 1562.386962890625
+    'sbg:y': 114.486572265625
+  - id: removefirstline
+    in:
+      - id: infile
+        source: semibin2/binAssignment
+    out:
+      - id: binAssignment
+    run: tools/removefirstline.cwl
+    label: remove first line
+    'sbg:x': 638.3487548828125
+    'sbg:y': -734.4201049804688
+  - id: filterbin
+    in:
+      - id: assembledContigs
+        source: megahit/contigs
+      - id: binTSV
+        source: vamb2bintsv/binAssignment
+    out:
+      - id: filtered
+    run: tools/filterbin.cwl
+    label: filter bin TSV by size
+    'sbg:x': 763.8992919921875
+    'sbg:y': -487.2594909667969
+  - id: metabat
+    in:
+      - id: bamfiles
+        source:
+          - samtools_sort/output
+      - id: contigs
+        source: megahit/contigs
+    out:
+      - id: binAssignment
+    run: tools/metabat.cwl
+    label: >-
+      MetaBAT: Metagenome Binning based on Abundance and Tetranucleotide
+      frequency
+    'sbg:x': 481.2071533203125
+    'sbg:y': -973.3815307617188
 requirements:
   - class: ScatterFeatureRequirement
   - class: MultipleInputFeatureRequirement
