@@ -5,6 +5,9 @@ label: "StrobeAlign - fast short read aligner"
 
 requirements:
   - class: InlineJavascriptRequirement
+  - class: ResourceRequirement
+    ramMin: 3000
+    coresMin: 10
 
 baseCommand: strobealign
 
@@ -30,7 +33,7 @@ inputs:
 
   thread-number:
     type: int?
-    default: 3
+    default: 10
     inputBinding:
       position: 1
       prefix: "-t"
@@ -48,7 +51,7 @@ arguments:
     prefix: '-o'
     valueFrom: |
       ${
-        return inputs.read1.nameroot + ""
+        return inputs.read1.nameroot.split("_")[0] + ".sam"
       }
 
 outputs:
@@ -57,5 +60,5 @@ outputs:
     type: File
     format: http://edamontology.org/format_2573 # SAM
     outputBinding:
-      glob: $(inputs.read1.nameroot + ".sam")
+      glob: $(inputs.read1.nameroot.split("_")[0] + ".sam")
 
