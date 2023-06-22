@@ -44,7 +44,7 @@ inputs:
     type: Directory
     inputBinding:
       position: 5
-      prefix: "--db_directory"
+      prefix: "--dbDirectory"
 
   searchEngine:
     type: string
@@ -60,16 +60,22 @@ inputs:
       prefix: "-t"
 
   writeBinEvals:
-    type: int
-    default: 1
+    type: boolean
+    default: true
     inputBinding:
       position: 8
       prefix: "--write_bin_evals"
+
+  proteins:
+    type: File?
+    inputBinding:
+      position: 9
+      prefix: "-p"
 
 outputs:
   binTSV:
     type: File
     format: http://edamontology.org/format_3475 # TSV
     outputBinding:
-      glob: $(inputs.outPrefix + "_DASTool_scaffolds2bin.txt")
+      glob: $(inputs.outPrefix + "_DASTool_contig2bin.tsv")
 

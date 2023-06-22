@@ -4,6 +4,9 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 requirements:
+  - class: ResourceRequirement
+    ramMin: 50000
+    coresMin: 10
   - class: InitialWorkDirRequirement
     listing:
       - '$(inputs.dataDir)'
@@ -22,7 +25,7 @@ inputs:
   
   thread-number:
     type: int?
-    default: 6
+    default: 10
     inputBinding:
       position: 1
       prefix: "-t"
@@ -53,14 +56,21 @@ inputs:
 #    inputBinding:
 #      position: 5
 
+  pplacer_threads:
+    type: int
+    default: 5 
+    inputBinding:
+      position: 1
+      prefix: "--pplacer_threads"
+
   outdir:
     type: string
     default: "checkm_out"
     inputBinding:
-      position: 6
+      position: 7
 
 arguments:
-  - position: 5
+  - position: 6
     valueFrom: "."
 
 outputs:

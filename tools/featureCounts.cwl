@@ -47,13 +47,13 @@ inputs:
     doc: "Count primary alignments only. Primary alignments are  identified using bit 0x100 in SAM/BAM FLAG field."
 
   # other paired-end arguments
-  orientation:
-    type: string
-    default: fr
+  paired:
+    type: boolean
+    default: true
     inputBinding:
       position: -4
-      prefix: -S
-    doc: "Specify orientation of two reads from the same pair, 'fr'  by by default (forward/reverse)."
+      prefix: -p
+
   pair_validity:
     type: boolean
     default: false
@@ -155,11 +155,11 @@ inputs:
   # performance
   threads:
     type: int
-    default: 8
+    default: 10
     inputBinding:
       position: -18
       prefix: -T
-    doc: "Number of the threads. 8 by default."
+    doc: "Number of the threads. 10 by default."
 
   bamFile:
     type: File
@@ -167,20 +167,20 @@ inputs:
     inputBinding:
       position: 1
 
-  outFile:
-    type: string
-    default: "featurecounts.tsv"
-    inputBinding:
-      position: 1
-      prefix: "-o"
+#  outFile:
+#    type: string
+#    default: "featurecounts.tsv"
+#    inputBinding:
+#      position: 1
+#      prefix: "-o"
 
-#arguments: 
-#  - position: 1
-#    prefix: "-o"
-#    valueFrom: |
-#      ${
-#        return inputs.bamFile.nameroot + ".tsv"
-#      }
+arguments: 
+  - position: 1
+    prefix: "-o"
+    valueFrom: |
+      ${
+        return inputs.bamFile.nameroot.split("_")[0]  + ".tsv"
+      }
 
 outputs:
 
@@ -188,4 +188,4 @@ outputs:
     type: File
     format: http://edamontology.org/format_3475 # TSV
     outputBinding:
-      glob: $(inputs.outFile)
+      glob: $(inputs.bamFile.nameroot.split("_")[0]  + ".tsv")

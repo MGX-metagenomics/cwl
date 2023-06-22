@@ -20,12 +20,10 @@ inputs:
     inputBinding:
       position: 1
 
-arguments:
-  - position: 2
-    valueFrom: |
-      ${
-        return inputs.bamFile.nameroot + ".cov"
-      }
+  outFile:
+    type: string
+    inputBinding:
+      position: 2
 
 outputs:
 
@@ -33,5 +31,5 @@ outputs:
     type: File
     format: http://edamontology.org/format_3475 # TSV
     outputBinding:
-      glob: $(inputs.bamFile.nameroot + ".cov")
+      glob: $(inputs.outFile)
 

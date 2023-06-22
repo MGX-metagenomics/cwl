@@ -7,31 +7,32 @@ hints:
 
 requirements:
   - class: InlineJavascriptRequirement
+  - class: ResourceRequirement
+    ramMin: 8000
+    coresMin: 20
 
 label: Prodigal 2.6.3
 
-baseCommand: prodigal
+baseCommand: pprodigal
 
 arguments:
   - position: 1
-    prefix: "-p"
-    valueFrom: "meta"
-  - position: 2
     prefix: "-f"
     valueFrom: "gff"
-  - position: 3
+
+  - position: 2
     prefix: '-o'
     valueFrom: |
       ${
         return inputs.inputFile.nameroot + ".gff"
       }
-  - position: 4
+  - position: 3
     prefix: '-a'
     valueFrom: |
       ${
         return inputs.inputFile.nameroot + ".faa"
       }
-  - position: 5
+  - position: 4
     prefix: '-d'
     valueFrom: |
       ${
@@ -41,11 +42,33 @@ arguments:
 
 inputs:
 
+  metagenomic:
+    type: boolean
+    inputBinding:
+      position: 1
+      prefix: "-p"
+      valueFrom: "meta"
+
   inputFile:
     type: File
     inputBinding:
       position: 6
       prefix: '-i'
+
+  tasks:
+    type: int
+    default: 20
+    inputBinding:
+      position: 7
+      prefix: '-T'
+
+  chunkSize:
+    type: int
+    default: 2000
+    inputBinding:
+      position: 8
+      prefix: '-C'
+
 
 outputs:
 
