@@ -130,10 +130,12 @@ steps:
     run: tools/checkm.cwl
     'sbg:x': 1425.5784912109375
     'sbg:y': -645.318115234375
-  - id: prodigal
+  - id: prodigal_per_bin
     in:
       - id: inputFile
         source: tsv2bins/binFastas
+      - id: metagenomic
+        default: false
     out:
       - id: annotations
       - id: genes
@@ -148,7 +150,7 @@ steps:
   - id: feature_counts_pe_samples
     in:
       - id: annotation
-        source: prodigal_1/annotations
+        source: prodigal_assembly/annotations
       - id: attribute_type
         default: ID
       - id: bamFile
@@ -162,8 +164,8 @@ steps:
     scatter:
       - bamFile
     scatterMethod: dotproduct
-    'sbg:x': 1710.6326904296875
-    'sbg:y': 397.3818664550781
+    'sbg:x': 1676.5452880859375
+    'sbg:y': 433.1310729980469
   - id: kraken2
     in:
       - id: confidenceThreshold
@@ -173,7 +175,7 @@ steps:
       - id: proteinQuery
         default: true
       - id: querySequences
-        source: prodigal/proteins
+        source: prodigal_per_bin/proteins
       - id: thread-number
         default: 10
     out:
@@ -219,33 +221,18 @@ steps:
     label: DAS tool
     'sbg:x': 1043.5084228515625
     'sbg:y': -626.27734375
-  - id: feature_counts_totalcoverage
-    in:
-      - id: annotation
-        source: prodigal_1/annotations
-      - id: attribute_type
-        default: ID
-      - id: bamFile
-        source: samtools_merge_all/output
-      - id: feature_type
-        default: CDS
-      - id: paired
-        default: true
-    out:
-      - id: output_counts
-    run: tools/featureCounts.cwl
-    'sbg:x': 1837.6478271484375
-    'sbg:y': 553.8271484375
   - id: bamstats
     in:
       - id: bamFile
         source: samtools_merge_all/output
+      - id: outFile
+        default: contig_coverage.tsv
     out:
       - id: tsvOutput
     run: tools/bamstats.cwl
     label: bamstats contig coverage
-    'sbg:x': 1698.8221435546875
-    'sbg:y': 788.7218017578125
+    'sbg:x': 1941.128662109375
+    'sbg:y': 624.66259765625
   - id: tsv2bins
     in:
       - id: assembledContigs
@@ -258,18 +245,20 @@ steps:
     label: TSV to binned FASTA
     'sbg:x': 1162.4385986328125
     'sbg:y': -487.7795104980469
-  - id: prodigal_1
+  - id: prodigal_assembly
     in:
       - id: inputFile
         source: megahit/contigs
+      - id: metagenomic
+        default: true
     out:
       - id: annotations
       - id: genes
       - id: proteins
     run: tools/prodigal.cwl
     label: Prodigal 2.6.3
-    'sbg:x': 1123.1719970703125
-    'sbg:y': 290.3439025878906
+    'sbg:x': 1101.5889892578125
+    'sbg:y': 372.96759033203125
   - id: annotationclient
     in:
       - id: apiKey
@@ -292,11 +281,11 @@ steps:
           - feature_counts_se_samples/output_counts
           - feature_counts_pe_samples/output_counts
       - id: featureCountsTotal
-        source: feature_counts_totalcoverage/output_counts
+        source: merge_featurecounts/tsvOutput
       - id: hostURI
         source: hostURI
       - id: predictedGenes
-        source: prodigal_1/annotations
+        source: prodigal_assembly/annotations
       - id: projectName
         source: projectName
       - id: runIds
@@ -455,7 +444,7 @@ steps:
   - id: feature_counts_se_samples
     in:
       - id: annotation
-        source: prodigal_1/annotations
+        source: prodigal_assembly/annotations
       - id: attribute_type
         default: ID
       - id: bamFile
@@ -469,8 +458,8 @@ steps:
     scatter:
       - bamFile
     scatterMethod: dotproduct
-    'sbg:x': 1562.386962890625
-    'sbg:y': 114.486572265625
+    'sbg:x': 1676.52392578125
+    'sbg:y': 251.05320739746094
   - id: removefirstline
     in:
       - id: infile
@@ -508,8 +497,21 @@ steps:
       frequency
     'sbg:x': 481.2071533203125
     'sbg:y': -973.3815307617188
+  - id: merge_featurecounts
+    in:
+      - id: featureCountsTSV
+        linkMerge: merge_flattened
+        source:
+          - feature_counts_se_samples/output_counts
+          - feature_counts_pe_samples/output_counts
+      - id: outFile
+        default: genecoverage_total.tsv
+    out:
+      - id: tsvOutput
+    run: tools/mergeFC.cwl
+    'sbg:x': 1843.674072265625
+    'sbg:y': 296.18115234375
 requirements:
   - class: ScatterFeatureRequirement
   - class: MultipleInputFeatureRequirement
   - class: InlineJavascriptRequirement
-
