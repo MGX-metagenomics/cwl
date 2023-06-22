@@ -7,7 +7,7 @@ requirements:
   InitialWorkDirRequirement:
     listing:
       - entryname: reformat.sh
-        entry: paste <(cut -f2 $(inputs.vambOutput)) <(cut -f1 $(inputs.vambOutput)) > reformatted.tsv
+        entry: paste <(cut -f2 $(inputs.vambOutput.path)) <(cut -f1 $(inputs.vambOutput.path)) > reformatted.tsv
 
 baseCommand: [ "bash", "reformat.sh" ]
 
