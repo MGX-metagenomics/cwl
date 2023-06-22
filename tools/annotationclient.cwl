@@ -5,6 +5,7 @@ hints:
   DockerRequirement:     
     dockerPull: sjaenick/mgxannotate
 
+
 label: "MGX Annotate"
 
 requirements:
@@ -18,8 +19,12 @@ requirements:
       - '$(inputs.predictedGenes)'
       - '$(inputs.featureCountsTotal)'
       - '$(inputs.contigCoverage)'
+  - class: ResourceRequirement
+    ramMin: 2000
+    coresMin: 2
 
-baseCommand: ["annotationclient"]
+
+baseCommand: ["AnnotationClient"]
 
 inputs:
 
