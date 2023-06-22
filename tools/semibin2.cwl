@@ -9,6 +9,10 @@ label: "SemiBin 2"
 
 requirements:
   - class: InlineJavascriptRequirement
+  - class: ResourceRequirement
+    ramMin: 10000
+    coresMin: 40
+
 
 baseCommand: [SemiBin2, single_easy_bin]
 
@@ -36,7 +40,7 @@ inputs:
 
   threads:
     type: int?
-    default: 10
+    default: 40
     inputBinding:
       position: 4
       prefix: "--threads"
@@ -50,10 +54,6 @@ arguments:
     valueFrom: "--self-supervised"
 
   - position: 7
-    prefix: "--environment"
-    valueFrom: "global"
-
-  - position: 8
     prefix: "--engine"
     valueFrom: "cpu"
 
