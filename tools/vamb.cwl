@@ -9,6 +9,10 @@ label: "VAMB"
 
 requirements:
   - class: InlineJavascriptRequirement
+  - class: ResourceRequirement
+    ramMin: 5000
+    coresMin: 40
+
 
 baseCommand: vamb
 
@@ -29,20 +33,35 @@ inputs:
 
   threads:
     type: int?
-    default: 10
+    default: 40
     inputBinding:
       position: 3
       prefix: "-p"
 
+  seed:
+    type: int
+    default: 42
+    inputBinding:
+      position: 4
+      prefix: "--seed"
+
+  mincontiglength:
+    type: int
+    default: 1000
+    inputBinding:
+      position: 5
+      prefix: "-m"
+
+
 arguments:
-  - position: 4
+  - position: 5
     prefix: "--outdir"
-    valueFrom: "outdir"
+    valueFrom: "vamb_outdir"
 
 outputs:
   binAssignment:
     type: File
     format: http://edamontology.org/format_3475 # TSV
     outputBinding:
-      glob: outdir/clusters.tsv
+      glob: vamb_outdir/vae_clusters.tsv
 
