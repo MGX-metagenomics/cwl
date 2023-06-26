@@ -27,7 +27,7 @@ inputs:
 
   fractionCutoff:
     type: string
-    default: "0.8"
+    default: "0.55"
     inputBinding:
       position: 3
 

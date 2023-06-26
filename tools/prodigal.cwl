@@ -44,6 +44,7 @@ inputs:
 
   metagenomic:
     type: boolean
+    default: false
     inputBinding:
       position: 1
       prefix: "-p"

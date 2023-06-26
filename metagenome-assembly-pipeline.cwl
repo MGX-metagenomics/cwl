@@ -35,14 +35,14 @@ inputs:
     type: Directory
     'sbg:x': 1310.708251953125
     'sbg:y': -735.12158203125
-  - id: kraken2DatabaseDir
-    type: Directory
-    'sbg:x': 1405.8983154296875
-    'sbg:y': -285.9196472167969
   - id: dastoolDatabaseDir
     type: Directory
     'sbg:x': 909.6793823242188
     'sbg:y': -747.2562866210938
+  - id: metabuliDatabaseDir
+    type: Directory
+    'sbg:x': 1301.1171875
+    'sbg:y': -289.041748046875
 outputs:
   - id: success
     outputSource:
@@ -53,6 +53,8 @@ outputs:
 steps:
   - id: fastp
     in:
+      - id: detect-paired-end-adapter
+        default: true
       - id: read1
         source: seqrunfetch/fwdReads
       - id: read2
@@ -72,6 +74,8 @@ steps:
     'sbg:y': 419.8493957519531
   - id: megahit
     in:
+      - id: presets
+        default: meta-sensitive
       - id: read1
         source:
           - fastp/reads1
@@ -130,23 +134,6 @@ steps:
     run: tools/checkm.cwl
     'sbg:x': 1425.5784912109375
     'sbg:y': -645.318115234375
-  - id: prodigal_per_bin
-    in:
-      - id: inputFile
-        source: tsv2bins/binFastas
-      - id: metagenomic
-        default: false
-    out:
-      - id: annotations
-      - id: genes
-      - id: proteins
-    run: tools/prodigal.cwl
-    label: Prodigal 2.6.3
-    scatter:
-      - inputFile
-    scatterMethod: dotproduct
-    'sbg:x': 1275.5765380859375
-    'sbg:y': -337.3270568847656
   - id: feature_counts_pe_samples
     in:
       - id: annotation
@@ -166,30 +153,10 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': 1676.5452880859375
     'sbg:y': 433.1310729980469
-  - id: kraken2
-    in:
-      - id: confidenceThreshold
-        default: 0.6
-      - id: databaseDir
-        source: kraken2DatabaseDir
-      - id: proteinQuery
-        default: true
-      - id: querySequences
-        source: prodigal_per_bin/proteins
-      - id: thread-number
-        default: 10
-    out:
-      - id: output
-    run: tools/kraken2.cwl
-    scatter:
-      - querySequences
-    scatterMethod: dotproduct
-    'sbg:x': 1525.156982421875
-    'sbg:y': -324.01104736328125
   - id: assign_bin
     in:
       - id: kraken2Output
-        source: kraken2/output
+        source: metabuli/output
       - id: taxonomyDirectory
         source: taxonomyDirectory
     out:
@@ -250,7 +217,7 @@ steps:
       - id: inputFile
         source: megahit/contigs
       - id: metagenomic
-        default: true
+        default: false
     out:
       - id: annotations
       - id: genes
@@ -511,6 +478,20 @@ steps:
     run: tools/mergeFC.cwl
     'sbg:x': 1843.674072265625
     'sbg:y': 296.18115234375
+  - id: metabuli
+    in:
+      - id: databaseDir
+        source: metabuliDatabaseDir
+      - id: querySequences
+        source: tsv2bins/binFastas
+    out:
+      - id: output
+    run: tools/metabuli.cwl
+    scatter:
+      - querySequences
+    scatterMethod: dotproduct
+    'sbg:x': 1495.70849609375
+    'sbg:y': -319.610107421875
 requirements:
   - class: ScatterFeatureRequirement
   - class: MultipleInputFeatureRequirement
