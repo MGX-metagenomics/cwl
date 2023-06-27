@@ -6,7 +6,7 @@ label: "fastp: An ultra-fast all-in-one FASTQ preprocessor"
 requirements:
   - class: ResourceRequirement
     ramMin: 3000
-    coresMin: 8
+    coresMin: 10
   - class: InlineJavascriptRequirement
 
 hints:
@@ -69,7 +69,7 @@ inputs:
 
   thread-number:
     type: int?
-    default: 8
+    default: 10
     inputBinding:
       position: 11
       prefix: "--thread"
