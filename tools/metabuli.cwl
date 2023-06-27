@@ -9,6 +9,10 @@ requirements:
     listing:
       - '$(inputs.databaseDir)'
 
+hints:   
+  DockerRequirement:     
+    dockerPull: sjaenick/metabuli
+
 baseCommand: [ metabuli, classify ] 
 
 inputs:
