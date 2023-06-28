@@ -20,7 +20,7 @@ requirements:
       - '$(inputs.featureCountsTotal)'
       - '$(inputs.contigCoverage)'
   - class: ResourceRequirement
-    ramMin: 2000
+    ramMin: 5000
     coresMin: 2
 
 
