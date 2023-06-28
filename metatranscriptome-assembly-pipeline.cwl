@@ -1,5 +1,5 @@
 class: Workflow
-cwlVersion: v1.0
+cwlVersion: v1.2
 id: metatranscriptome_assembly_pipeline
 label: Metatranscriptome Assembly and Quantification
 $namespaces:
@@ -28,8 +28,8 @@ inputs:
     'sbg:y': -85.73023986816406
   - id: sequencingAdaptersFile
     type: File
-    'sbg:x': -411.94390869140625
-    'sbg:y': 195.99688720703125
+    'sbg:x': -185.31167602539062
+    'sbg:y': 196.1172637939453
 outputs:
   - id: success
     outputSource:
@@ -163,10 +163,16 @@ steps:
       - id: assemblyName
         source: assemblyName
       - id: binnedFastas
+        linkMerge: merge_nested
         source:
           - rnaspades/contigs
       - id: contigCoverage
         source: bamstats/tsvOutput
+      - id: featureCountsPerSample
+        linkMerge: merge_flattened
+        source:
+          - feature_counts_se/output_counts
+          - feature_counts_pe/output_counts
       - id: featureCountsTotal
         source: merge_f_c/tsvOutput
       - id: hostURI
@@ -188,6 +194,8 @@ steps:
     in:
       - id: bamFile
         source: samtools_merge_all/output
+      - id: outFile
+        default: contig_coverage.tsv
     out:
       - id: tsvOutput
     run: tools/bamstats.cwl
@@ -214,8 +222,10 @@ steps:
     'sbg:y': 897.0208129882812
   - id: trimmomatic_se
     in:
+      - id: end_mode
+        default: SE
       - id: fwdReads
-        source: seqrunfetch/singleReads
+        source: ribodetector/fwdFiltered
       - id: input_adapters_file
         source: sequencingAdaptersFile
     out:
@@ -224,16 +234,18 @@ steps:
     run: tools/trimmomatic.cwl
     scatter:
       - fwdReads
-    when: $(inputs.fwdReads != null)
     scatterMethod: dotproduct
-    'sbg:x': -232.0114288330078
-    'sbg:y': 98.92937469482422
+    'sbg:x': 121.0569839477539
+    'sbg:y': 76.77188873291016
+    when: $(inputs.fwdReads != null)
   - id: trimmomatic_pe
     in:
+      - id: end_mode
+        default: PE
       - id: fwdReads
-        source: seqrunfetch/fwdReads
+        source: ribodetector_1/fwdFiltered
       - id: revReads
-        source: seqrunfetch/revReads
+        source: ribodetector_1/revFiltered
       - id: input_adapters_file
         source: sequencingAdaptersFile
     out:
@@ -244,8 +256,8 @@ steps:
       - fwdReads
       - revReads
     scatterMethod: dotproduct
-    'sbg:x': -246.01039123535156
-    'sbg:y': 358.07476806640625
+    'sbg:x': 117.1124038696289
+    'sbg:y': 341.240966796875
   - id: strobealign_se
     in:
       - id: read1
@@ -292,11 +304,45 @@ steps:
         source:
           - feature_counts_se/output_counts
           - feature_counts_pe/output_counts
+      - id: outFile
+        default: genecoverage_total.tsv
     out:
       - id: tsvOutput
     run: tools/mergeFC.cwl
     'sbg:x': 3665.084228515625
     'sbg:y': 403.438232421875
+  - id: ribodetector
+    in:
+      - id: fwdReads
+        source: seqrunfetch/singleReads
+    out:
+      - id: fwdFiltered
+      - id: revFiltered
+    run: tools/ribodetector.cwl
+    label: RiboDetector
+    scatter:
+      - fwdReads
+    scatterMethod: dotproduct
+    'sbg:x': -461.6506042480469
+    'sbg:y': 42.87717056274414
+  - id: ribodetector_1
+    in:
+      - id: fwdReads
+        source: seqrunfetch/fwdReads
+      - id: revReads
+        source: seqrunfetch/revReads
+    out:
+      - id: fwdFiltered
+      - id: revFiltered
+    run: tools/ribodetector.cwl
+    label: RiboDetector
+    scatter:
+      - fwdReads
+      - revReads
+    scatterMethod: dotproduct
+    'sbg:x': -459.84661865234375
+    'sbg:y': 350.7164611816406
 requirements:
   - class: ScatterFeatureRequirement
   - class: MultipleInputFeatureRequirement
+  - class: InlineJavascriptRequirement

@@ -45,6 +45,7 @@ inputs:
     doc: FASTQ file for read R2 in Paired End mode
 
   - id: illuminaclip
+    default: ":2:30:10"
     type: string
     doc: >
       <fastaWithAdaptersEtc>:<seed mismatches>:<palindrome clip
