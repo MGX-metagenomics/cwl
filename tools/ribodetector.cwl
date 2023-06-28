@@ -31,10 +31,10 @@ arguments:
 
   - position: 6
     prefix: "-o"
-    valueFrom: ${ return inputs.fwdReads.nameroot + "_filtered.fq")
+    valueFrom: ${ return inputs.fwdReads.nameroot + "_filtered.fq" }
 
   - position: 7
-    valueFrom: ${ return inputs.revReads.nameroot + "_filtered.fq")
+    valueFrom: ${ return inputs.revReads.nameroot + "_filtered.fq" }
 
 inputs:
 
