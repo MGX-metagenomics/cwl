@@ -26,6 +26,10 @@ inputs:
     type: string
     'sbg:x': 4488.1689453125
     'sbg:y': -85.73023986816406
+  - id: sequencingAdaptersFile
+    type: File
+    'sbg:x': -411.94390869140625
+    'sbg:y': 195.99688720703125
 outputs:
   - id: success
     outputSource:
@@ -34,23 +38,6 @@ outputs:
     'sbg:x': 4874.22802734375
     'sbg:y': -308.88360595703125
 steps:
-  - id: fastp
-    in:
-      - id: read1
-        source: seqrunfetch/fwdReads
-      - id: read2
-        source: seqrunfetch/revReads
-    out:
-      - id: reads1
-      - id: reads2
-    run: tools/fastp.cwl
-    label: 'fastp: An ultra-fast all-in-one FASTQ preprocessor'
-    scatter:
-      - read1
-      - read2
-    scatterMethod: dotproduct
-    'sbg:x': -12.6336088180542
-    'sbg:y': 332.4124450683594
   - id: seqrunfetch
     in:
       - id: apiKey
@@ -64,6 +51,7 @@ steps:
     out:
       - id: fwdReads
       - id: revReads
+      - id: singleReads
     run: tools/seqrunfetch.cwl
     label: MGX Fetch sequences
     scatter:
@@ -75,39 +63,45 @@ steps:
     in:
       - id: read1
         source:
-          - fastp/reads1
+          - trimmomatic_pe/fwdTrimmed
       - id: read2
         source:
-          - fastp/reads2
+          - trimmomatic_pe/revTrimmed
+      - id: thread-number
+        default: 125
+      - id: unpaired
+        source:
+          - trimmomatic_se/fwdTrimmed
     out:
       - id: contigs
     run: tools/rnaspades.cwl
     label: rnaSPAdes
-    scatter:
-      - read1
-      - read2
-    scatterMethod: dotproduct
-    'sbg:x': 728.2256469726562
-    'sbg:y': 63.06300735473633
+    'sbg:x': 444.4377136230469
+    'sbg:y': 241.66441345214844
   - id: prodigal
     in:
       - id: inputFile
         source: rnaspades/contigs
+      - id: metagenomic
+        default: true
     out:
       - id: annotations
       - id: genes
       - id: proteins
     run: tools/prodigal.cwl
     label: Prodigal 2.6.3
-    'sbg:x': 1473.29443359375
-    'sbg:y': 193.52017211914062
+    'sbg:x': 2489.327880859375
+    'sbg:y': 239.57028198242188
   - id: samtools_sam2bam
     in:
       - id: input
-        source: strobealign/sam
+        source: strobealign_pe/sam
     out:
       - id: output
     run: tools/samtools-sam2bam.cwl
+    scatter:
+      - input
+    scatterMethod: dotproduct
     'sbg:x': 1672.1806640625
     'sbg:y': 894.350830078125
   - id: samtools_sort
@@ -117,9 +111,38 @@ steps:
     out:
       - id: output
     run: tools/samtools-sort.cwl
+    scatter:
+      - input
+    scatterMethod: dotproduct
     'sbg:x': 1964.7889404296875
     'sbg:y': 893.903564453125
-  - id: feature_counts
+  - id: feature_counts_se
+    in:
+      - id: annotation
+        source: prodigal/annotations
+      - id: bamFile
+        source: samtools_sort_1/output
+    out:
+      - id: output_counts
+    run: tools/featureCounts.cwl
+    scatter:
+      - bamFile
+    scatterMethod: dotproduct
+    'sbg:x': 3332.6796875
+    'sbg:y': 333.0718994140625
+  - id: samtools_merge_all
+    in:
+      - id: inputs
+        linkMerge: merge_flattened
+        source:
+          - samtools_sort/output
+          - samtools_sort_1/output
+    out:
+      - id: output
+    run: tools/samtools-merge.cwl
+    'sbg:x': 2846.90625
+    'sbg:y': 1069.1043701171875
+  - id: feature_counts_pe
     in:
       - id: annotation
         source: prodigal/annotations
@@ -128,29 +151,11 @@ steps:
     out:
       - id: output_counts
     run: tools/featureCounts.cwl
-    'sbg:x': 3685.063720703125
-    'sbg:y': 118.17881774902344
-  - id: samtools_merge
-    in:
-      - id: inputs
-        source:
-          - samtools_sort/output
-    out:
-      - id: output
-    run: tools/samtools-merge.cwl
-    'sbg:x': 2846.90625
-    'sbg:y': 1069.1043701171875
-  - id: feature_counts_1
-    in:
-      - id: annotation
-        source: prodigal/annotations
-      - id: bamFile
-        source: samtools_merge/output
-    out:
-      - id: output_counts
-    run: tools/featureCounts.cwl
-    'sbg:x': 3369.6025390625
-    'sbg:y': 981.9159545898438
+    scatter:
+      - bamFile
+    scatterMethod: dotproduct
+    'sbg:x': 3347.258056640625
+    'sbg:y': 562.1612548828125
   - id: annotationclient
     in:
       - id: apiKey
@@ -159,14 +164,11 @@ steps:
         source: assemblyName
       - id: binnedFastas
         source:
-          - tsv2bins/binFastas
+          - rnaspades/contigs
       - id: contigCoverage
         source: bamstats/tsvOutput
-      - id: featureCountsPerSample
-        source:
-          - renamefile/outfile
       - id: featureCountsTotal
-        source: feature_counts_1/output_counts
+        source: merge_f_c/tsvOutput
       - id: hostURI
         source: hostURI
       - id: predictedGenes
@@ -185,49 +187,116 @@ steps:
   - id: bamstats
     in:
       - id: bamFile
-        source: samtools_merge/output
+        source: samtools_merge_all/output
     out:
       - id: tsvOutput
     run: tools/bamstats.cwl
     label: 'bamstats: BAM alignment statistics per reference sequence'
-    'sbg:x': 3383.6025390625
-    'sbg:y': 1242.5023193359375
-  - id: renamefile
-    in:
-      - id: srcfile
-        source: feature_counts/output_counts
-      - id: newname
-        source: runIds
-    out:
-      - id: outfile
-    run: tools/renamefile.cwl
-    scatter:
-      - srcfile
-      - newname
-    scatterMethod: dotproduct
-    'sbg:x': 3892.1767578125
-    'sbg:y': 186.96112060546875
-  - id: tsv2bins
-    in: []
-    out:
-      - id: binFastas
-    run: tools/tsv2bins.cwl
-    label: TSV to binned FASTA
-    'sbg:x': 3747.49755859375
-    'sbg:y': -645.3556518554688
-  - id: strobealign
+    'sbg:x': 3370.869140625
+    'sbg:y': 1072.1676025390625
+  - id: strobealign_pe
     in:
       - id: read1
-        source: fastp/reads2
+        source: trimmomatic_pe/fwdTrimmed
       - id: read2
-        source: fastp/reads1
+        source: trimmomatic_pe/revTrimmed
       - id: reference
         source: rnaspades/contigs
     out:
       - id: sam
     run: tools/strobealign.cwl
-    label: StrobeAlign - fast short read aligner
+    label: 'StrobeAlign: map PE reads'
+    scatter:
+      - read1
+      - read2
+    scatterMethod: dotproduct
     'sbg:x': 1346.361572265625
     'sbg:y': 897.0208129882812
+  - id: trimmomatic_se
+    in:
+      - id: fwdReads
+        source: seqrunfetch/singleReads
+      - id: input_adapters_file
+        source: sequencingAdaptersFile
+    out:
+      - id: fwdTrimmed
+      - id: revTrimmed
+    run: tools/trimmomatic.cwl
+    scatter:
+      - fwdReads
+    when: $(inputs.fwdReads != null)
+    scatterMethod: dotproduct
+    'sbg:x': -232.0114288330078
+    'sbg:y': 98.92937469482422
+  - id: trimmomatic_pe
+    in:
+      - id: fwdReads
+        source: seqrunfetch/fwdReads
+      - id: revReads
+        source: seqrunfetch/revReads
+      - id: input_adapters_file
+        source: sequencingAdaptersFile
+    out:
+      - id: fwdTrimmed
+      - id: revTrimmed
+    run: tools/trimmomatic.cwl
+    scatter:
+      - fwdReads
+      - revReads
+    scatterMethod: dotproduct
+    'sbg:x': -246.01039123535156
+    'sbg:y': 358.07476806640625
+  - id: strobealign_se
+    in:
+      - id: read1
+        source: trimmomatic_se/fwdTrimmed
+      - id: reference
+        source: rnaspades/contigs
+    out:
+      - id: sam
+    run: tools/strobealign.cwl
+    label: 'StrobeAlign: map SE reads'
+    scatter:
+      - read1
+    scatterMethod: dotproduct
+    'sbg:x': 1324.580810546875
+    'sbg:y': 50.46404266357422
+  - id: samtools_sam2bam_1
+    in:
+      - id: input
+        source: strobealign_se/sam
+    out:
+      - id: output
+    run: tools/samtools-sam2bam.cwl
+    scatter:
+      - input
+    scatterMethod: dotproduct
+    'sbg:x': 1661.573974609375
+    'sbg:y': 56.39213180541992
+  - id: samtools_sort_1
+    in:
+      - id: input
+        source: samtools_sam2bam_1/output
+    out:
+      - id: output
+    run: tools/samtools-sort.cwl
+    scatter:
+      - input
+    scatterMethod: dotproduct
+    'sbg:x': 2009.41796875
+    'sbg:y': 51
+  - id: merge_f_c
+    in:
+      - id: featureCountsTSV
+        linkMerge: merge_flattened
+        source:
+          - feature_counts_se/output_counts
+          - feature_counts_pe/output_counts
+    out:
+      - id: tsvOutput
+    run: tools/mergeFC.cwl
+    'sbg:x': 3665.084228515625
+    'sbg:y': 403.438232421875
 requirements:
   - class: ScatterFeatureRequirement
+  - class: MultipleInputFeatureRequirement
