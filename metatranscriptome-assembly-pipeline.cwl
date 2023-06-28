@@ -24,6 +24,7 @@ inputs:
     'sbg:y': -272.5052490234375
   - id: assemblyName
     type: string
+    doc: Name of the assembly
     'sbg:x': 4488.1689453125
     'sbg:y': -85.73023986816406
   - id: sequencingAdaptersFile
