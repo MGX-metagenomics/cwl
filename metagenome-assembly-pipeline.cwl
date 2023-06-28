@@ -29,8 +29,8 @@ inputs:
     'sbg:y': -196.57472229003906
   - id: taxonomyDirectory
     type: Directory
-    'sbg:x': 1716.697509765625
-    'sbg:y': -395.3261413574219
+    'sbg:x': 1731.2672119140625
+    'sbg:y': -357.7862548828125
   - id: checkmDataDir
     type: Directory
     'sbg:x': 1310.708251953125
@@ -234,7 +234,7 @@ steps:
         source: assemblyName
       - id: binLineages
         source:
-          - assign_bin/lineage
+          - rename_tax_file/renamedFile
       - id: binnedFastas
         source:
           - tsv2bins/binFastas
@@ -490,8 +490,23 @@ steps:
     scatter:
       - querySequences
     scatterMethod: dotproduct
-    'sbg:x': 1495.70849609375
-    'sbg:y': -319.610107421875
+    'sbg:x': 1438.596923828125
+    'sbg:y': -284.7552490234375
+  - id: rename_tax_file
+    in:
+      - id: binFile
+        source: tsv2bins/binFastas
+      - id: taxFile
+        source: assign_bin/lineage
+    out:
+      - id: renamedFile
+    run: tools/renameTaxFile.cwl
+    scatter:
+      - binFile
+      - taxFile
+    scatterMethod: dotproduct
+    'sbg:x': 2175.639892578125
+    'sbg:y': -391.54400634765625
 requirements:
   - class: ScatterFeatureRequirement
   - class: MultipleInputFeatureRequirement
