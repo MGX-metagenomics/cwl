@@ -13,7 +13,7 @@ requirements:
     ramMin: 5000
     coresMin: 10
 
-baseCommand: ribodetector
+baseCommand: ribodetector_cpu
 
 arguments:
 
@@ -50,7 +50,6 @@ inputs:
     format: http://edamontology.org/format_1930 # FASTQ
     inputBinding:
       position: 5
-      prefix: "-i"
 
 outputs:
 
