@@ -226,7 +226,7 @@ steps:
       - id: end_mode
         default: SE
       - id: fwdReads
-        source: ribodetector/fwdFiltered
+        source: ribodetector_se/fwdFiltered
       - id: input_adapters_file
         source: sequencingAdaptersFile
     out:
@@ -244,9 +244,9 @@ steps:
       - id: end_mode
         default: PE
       - id: fwdReads
-        source: ribodetector_1/fwdFiltered
+        source: ribodetector_pe/fwdFiltered
       - id: revReads
-        source: ribodetector_1/revFiltered
+        source: ribodetector_pe/revFiltered
       - id: input_adapters_file
         source: sequencingAdaptersFile
     out:
@@ -312,7 +312,7 @@ steps:
     run: tools/mergeFC.cwl
     'sbg:x': 3665.084228515625
     'sbg:y': 403.438232421875
-  - id: ribodetector
+  - id: ribodetector_se
     in:
       - id: fwdReads
         source: seqrunfetch/singleReads
@@ -327,7 +327,7 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': -461.6506042480469
     'sbg:y': 42.87717056274414
-  - id: ribodetector_1
+  - id: ribodetector_pe
     in:
       - id: fwdReads
         source: seqrunfetch/fwdReads
