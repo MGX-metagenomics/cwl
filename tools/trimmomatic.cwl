@@ -45,7 +45,7 @@ inputs:
     doc: FASTQ file for read R2 in Paired End mode
 
   - id: illuminaclip
-    default: ":2:30:10"
+    default: "2:30:10"
     type: string
     doc: >
       <fastaWithAdaptersEtc>:<seed mismatches>:<palindrome clip
@@ -152,12 +152,12 @@ arguments:
   - position: 5
     valueFrom: |
       ${
-        inputs.fwdReads.nameroot + '_trimmed.fq'
+        return inputs.fwdReads.nameroot + '_trimmed.fq'
       }
   - position: 6
     valueFrom: |
       ${
-        inputs.fwdReads.nameroot + '_unpaired_trimmed.fq'
+        return inputs.fwdReads.nameroot + '_unpaired_trimmed.fq'
       }
   - position: 7
     valueFrom: |
@@ -176,6 +176,6 @@ arguments:
 
   - position: 9
     valueFrom: >-
-      $("ILLUMINACLIP:" + inputs.input_adapters_file.path + ":"+
+      $("ILLUMINACLIP:" + inputs.input_adapters_file.path + ":" +
       inputs.illuminaclip)
 
