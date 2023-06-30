@@ -320,6 +320,7 @@ steps:
       - id: fwdFiltered
       - id: revFiltered
     run: tools/ribodetector.cwl
+    when: $(inputs.fwdReads != null)
     label: RiboDetector
     scatter:
       - fwdReads
