@@ -57,12 +57,12 @@ outputs:
     type: File
     format: http://edamontology.org/format_1930 # FASTQ
     outputBinding:
-      glob: $(arguments.fwdReads.nameroot + "_filtered.fq")
+      glob: $(inputs.fwdReads.nameroot + "_filtered.fq")
 
   revFiltered:
     type: File?
     format: http://edamontology.org/format_1930 # FASTQ
     outputBinding:
-      glob: $(arguments.revReads.nameroot + "_filtered.fq")
+      glob: $(inputs.revReads.nameroot + "_filtered.fq")
 
 
