@@ -238,7 +238,6 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': 121.0569839477539
     'sbg:y': 76.77188873291016
-    when: $(inputs.fwdReads != null)
   - id: trimmomatic_pe
     in:
       - id: end_mode
