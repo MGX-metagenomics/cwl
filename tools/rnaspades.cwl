@@ -13,25 +13,37 @@ arguments:
 inputs:
 
   read1:
-    type: File[]?
+    type:
+      - "null"
+      - type: array
+        items: File
+        inputBinding:
+          prefix: "-1"
     format: http://edamontology.org/format_1930 # FASTQ
     inputBinding:
       position: 2
-      prefix: "-1"
 
   read2:
-    type: File[]?
+    type:
+      - "null"
+      - type: array
+        items: File
+        inputBinding:
+          prefix: "-2"
     format: http://edamontology.org/format_1930 # FASTQ
     inputBinding:
-      position: 3
-      prefix: "-2"
+      position: 2
 
   unpaired:
-    type: File[]?
+    type:
+      - "null"
+      - type: array
+        items: File
+        inputBinding:
+          prefix: "-s"
     format: http://edamontology.org/format_1930 # FASTQ
     inputBinding:
-      position: 4
-      prefix: "-s"
+      position: 2
 
   thread-number:
     type: int?
