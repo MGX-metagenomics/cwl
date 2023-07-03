@@ -73,6 +73,7 @@ steps:
       - id: unpaired
         source:
           - trimmomatic_se/fwdTrimmed
+        pickValue: all_non_null
     out:
       - id: contigs
     run: tools/rnaspades.cwl
@@ -121,8 +122,12 @@ steps:
     in:
       - id: annotation
         source: prodigal/annotations
+      - id: attribute_type
+        default: ID
       - id: bamFile
         source: samtools_sort_1/output
+      - id: feature_type
+        default: CDS
     out:
       - id: output_counts
     run: tools/featureCounts.cwl
@@ -147,8 +152,12 @@ steps:
     in:
       - id: annotation
         source: prodigal/annotations
+      - id: attribute_type
+        default: ID
       - id: bamFile
         source: samtools_sort/output
+      - id: feature_type
+        default: CDS
     out:
       - id: output_counts
     run: tools/featureCounts.cwl
@@ -175,7 +184,7 @@ steps:
           - feature_counts_se/output_counts
           - feature_counts_pe/output_counts
       - id: featureCountsTotal
-        source: merge_f_c/tsvOutput
+        source: merge_featurecounts/tsvOutput
       - id: hostURI
         source: hostURI
       - id: predictedGenes
@@ -233,6 +242,7 @@ steps:
       - id: fwdTrimmed
       - id: revTrimmed
     run: tools/trimmomatic.cwl
+    when: $(inputs.fwdReads != null)
     scatter:
       - fwdReads
     scatterMethod: dotproduct
@@ -262,6 +272,7 @@ steps:
     in:
       - id: read1
         source: trimmomatic_se/fwdTrimmed
+        pickValue: all_non_null
       - id: reference
         source: rnaspades/contigs
     out:
@@ -297,7 +308,7 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': 2009.41796875
     'sbg:y': 51
-  - id: merge_f_c
+  - id: merge_featurecounts
     in:
       - id: featureCountsTSV
         linkMerge: merge_flattened
