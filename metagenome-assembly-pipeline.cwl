@@ -177,7 +177,7 @@ steps:
           - filterbin/filtered
           - metabat/binAssignment
       - id: contigs
-        source: megahit/contigs
+        source: rename_contigs/renamedFile
       - id: dastoolDatabaseDir
         source: dastoolDatabaseDir
       - id: threads
@@ -203,7 +203,7 @@ steps:
   - id: tsv2bins
     in:
       - id: assembledContigs
-        source: megahit/contigs
+        source: rename_contigs/renamedFile
       - id: scaffold2bin
         source: dastool/binTSV
     out:
@@ -215,7 +215,7 @@ steps:
   - id: prodigal_assembly
     in:
       - id: inputFile
-        source: megahit/contigs
+        source: rename_contigs/renamedFile
       - id: metagenomic
         default: false
     out:
@@ -292,7 +292,7 @@ steps:
       - id: read2
         source: fastp/reads2
       - id: reference
-        source: megahit/contigs
+        source: rename_contigs/renamedFile
       - id: skip_unaligned
         default: true
     out:
@@ -311,7 +311,7 @@ steps:
         source:
           - samtools_sort/output
       - id: contigs
-        source: megahit/contigs
+        source: rename_contigs/renamedFile
     out:
       - id: binAssignment
     run: tools/vamb.cwl
@@ -324,7 +324,7 @@ steps:
         source:
           - samtools_sort/output
       - id: contigs
-        source: megahit/contigs
+        source: rename_contigs/renamedFile
     out:
       - id: binAssignment
     run: tools/semibin2.cwl
@@ -362,7 +362,7 @@ steps:
         source: fastp_1/reads1
         pickValue: all_non_null
       - id: reference
-        source: megahit/contigs
+        source: rename_contigs/renamedFile
     out:
       - id: sam
     run: tools/strobealign.cwl
@@ -440,7 +440,7 @@ steps:
   - id: filterbin
     in:
       - id: assembledContigs
-        source: megahit/contigs
+        source: rename_contigs/renamedFile
       - id: binTSV
         source: vamb2bintsv/binAssignment
     out:
@@ -455,7 +455,7 @@ steps:
         source:
           - samtools_sort/output
       - id: contigs
-        source: megahit/contigs
+        source: rename_contigs/renamedFile
     out:
       - id: binAssignment
     run: tools/metabat.cwl
@@ -507,6 +507,17 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': 2175.639892578125
     'sbg:y': -391.54400634765625
+  - id: rename_contigs
+    in:
+      - id: inFile
+        source: megahit/contigs
+      - id: outFile
+        default: contigs.fasta
+    out:
+      - id: renamedFile
+    run: tools/renameContigs.cwl
+    'sbg:x': -296.1886291503906
+    'sbg:y': 397.2237548828125
 requirements:
   - class: ScatterFeatureRequirement
   - class: MultipleInputFeatureRequirement
