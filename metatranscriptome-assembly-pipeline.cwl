@@ -83,7 +83,7 @@ steps:
   - id: prodigal
     in:
       - id: inputFile
-        source: rnaspades/contigs
+        source: rename_contigs/renamedFile
       - id: metagenomic
         default: true
     out:
@@ -175,7 +175,7 @@ steps:
       - id: binnedFastas
         linkMerge: merge_nested
         source:
-          - rnaspades/contigs
+          - rename_contigs/renamedFile
       - id: contigCoverage
         source: bamstats/tsvOutput
       - id: featureCountsPerSample
@@ -219,7 +219,7 @@ steps:
       - id: read2
         source: trimmomatic_pe/revTrimmed
       - id: reference
-        source: rnaspades/contigs
+        source: rename_contigs/renamedFile
     out:
       - id: sam
     run: tools/strobealign.cwl
@@ -242,12 +242,12 @@ steps:
       - id: fwdTrimmed
       - id: revTrimmed
     run: tools/trimmomatic.cwl
-    when: $(inputs.fwdReads != null)
     scatter:
       - fwdReads
     scatterMethod: dotproduct
     'sbg:x': 121.0569839477539
     'sbg:y': 76.77188873291016
+    when: $(inputs.fwdReads != null)
   - id: trimmomatic_pe
     in:
       - id: end_mode
@@ -274,7 +274,7 @@ steps:
         source: trimmomatic_se/fwdTrimmed
         pickValue: all_non_null
       - id: reference
-        source: rnaspades/contigs
+        source: rename_contigs/renamedFile
     out:
       - id: sam
     run: tools/strobealign.cwl
@@ -330,13 +330,13 @@ steps:
       - id: fwdFiltered
       - id: revFiltered
     run: tools/ribodetector.cwl
-    when: $(inputs.fwdReads != null)
     label: RiboDetector
     scatter:
       - fwdReads
     scatterMethod: dotproduct
     'sbg:x': -461.6506042480469
     'sbg:y': 42.87717056274414
+    when: $(inputs.fwdReads != null)
   - id: ribodetector_pe
     in:
       - id: fwdReads
@@ -354,6 +354,17 @@ steps:
     scatterMethod: dotproduct
     'sbg:x': -459.84661865234375
     'sbg:y': 350.7164611816406
+  - id: rename_contigs
+    in:
+      - id: inFile
+        source: rnaspades/contigs
+      - id: outFile
+        default: transcripts.fasta
+    out:
+      - id: renamedFile
+    run: tools/renameContigs.cwl
+    'sbg:x': 913.1519775390625
+    'sbg:y': 341.80657958984375
 requirements:
   - class: ScatterFeatureRequirement
   - class: MultipleInputFeatureRequirement
