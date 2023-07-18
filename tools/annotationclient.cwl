@@ -3,8 +3,7 @@ class: CommandLineTool
 
 hints:   
   DockerRequirement:     
-    dockerPull: sjaenick/mgxannotate
-
+    dockerPull: sjaenick/mgxannotationclient
 
 label: "MGX Annotate"
 
