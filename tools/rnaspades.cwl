@@ -3,6 +3,10 @@ class: CommandLineTool
 
 label: rnaSPAdes
 
+hints:
+  DockerRequirement:
+    dockerPull: sjaenick/spades
+
 baseCommand: rnaspades.py
 
 arguments:

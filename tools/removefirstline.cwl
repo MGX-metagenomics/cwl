@@ -3,6 +3,10 @@ class: CommandLineTool
 
 label: "remove first line"
 
+hints:
+  DockerRequirement:
+    dockerPull: sjaenick/smallscripts
+
 requirements:
   InitialWorkDirRequirement:
     listing:

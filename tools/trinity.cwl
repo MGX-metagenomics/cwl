@@ -3,6 +3,10 @@ class: CommandLineTool
 
 label: Trinity
 
+hints:
+  DockerRequirement:
+    dockerPull: sjaenick/trinity
+
 requirements:
   - class: InlineJavascriptRequirement
 

@@ -3,6 +3,10 @@ class: CommandLineTool
 
 label: TransDecoder-Predict
 
+hints:
+  DockerRequirement:
+    dockerPull: sjaenick/transdecoder
+
 baseCommand: TransDecoder.Predict
 
 inputs:

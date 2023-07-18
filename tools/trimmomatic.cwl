@@ -5,6 +5,10 @@ cwlVersion: v1.0
 # https://github.com/UMCUGenetics/CWL/blob/master/tools/trimmomatic.cwl
 #
 
+hints:
+  DockerRequirement:
+    dockerPull: sjaenick/trimmomatic
+
 requirements:
   - class: ResourceRequirement
     ramMin: 3000

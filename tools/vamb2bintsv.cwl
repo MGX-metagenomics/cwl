@@ -3,6 +3,10 @@ class: CommandLineTool
 
 label: "VAMB to Bin TSV"
 
+hints:
+  DockerRequirement:
+    dockerPull: sjaenick/smallscripts
+
 requirements:
   InitialWorkDirRequirement:
     listing:

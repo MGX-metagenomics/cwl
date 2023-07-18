@@ -1,10 +1,14 @@
 class: CommandLineTool
 cwlVersion: v1.0
 
-baseCommand: cp
+hints:
+  DockerRequirement:
+    dockerPull: sjaenick/smallscripts
 
 requirements:
   - class: InlineJavascriptRequirement
+
+baseCommand: cp
 
 inputs:
 

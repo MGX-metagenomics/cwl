@@ -1,10 +1,14 @@
 class: CommandLineTool
 cwlVersion: v1.0
 
-baseCommand: renameContigs.pl
+hints:
+  DockerRequirement:
+    dockerPull: sjaenick/smallscripts
 
 requirements:
   - class: InlineJavascriptRequirement
+
+baseCommand: renameContigs.pl
 
 inputs:
 

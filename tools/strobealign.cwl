@@ -3,6 +3,10 @@ class: CommandLineTool
 
 label: "StrobeAlign - fast short read aligner"
 
+hints:
+  DockerRequirement:
+    dockerPull: sjaenick/strobealign
+
 requirements:
   - class: InlineJavascriptRequirement
   - class: ResourceRequirement

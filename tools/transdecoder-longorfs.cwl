@@ -3,6 +3,10 @@ class: CommandLineTool
 
 label: TransDecoder-LongOrfs
 
+hints:
+  DockerRequirement:
+    dockerPull: sjaenick/transdecoder
+
 baseCommand: TransDecoder.LongOrfs
 
 arguments:
